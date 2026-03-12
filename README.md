@@ -4,6 +4,11 @@ A minimal AI-powered writing assistant that generates ~500-word articles from a 
 
 ## Project Overview
 
+## Demo
+
+![AI Writer Screenshot](screenshots/home.png)
+![AI Writer Screenshot](screenshots/history.png)
+
 AI Writer lets you enter a topic and generate a full article with one click. Articles can be saved, viewed in history, and loaded back for editing. The backend uses an OpenAI-compatible API when configured, or falls back to a template article for local development and testing.
 
 ## Features
