@@ -10,17 +10,24 @@ async def generate_article(topic: str) -> str:
     根据主题生成约500字的文章
     """
     api_key = os.getenv("OPENAI_API_KEY")
-    
+
     if not api_key:
         # 无 API Key 时返回示例文章（开发/测试用）
         return _generate_fallback_article(topic)
-    
+
+    base_url = os.getenv("OPENAI_BASE_URL") or None
+    model = os.getenv("OPENAI_MODEL") or "gpt-4o-mini"
+
     try:
         import openai
-        client = openai.AsyncOpenAI(api_key=api_key)
-        
+
+        client = openai.AsyncOpenAI(
+            api_key=api_key,
+            base_url=base_url,
+        )
+
         response = await client.chat.completions.create(
-            model="gpt-3.5-turbo",
+            model=model,
             messages=[
                 {
                     "role": "system",
@@ -34,10 +41,10 @@ async def generate_article(topic: str) -> str:
             max_tokens=800,
             temperature=0.7
         )
-        
-        article = response.choices[0].message.content
-        return article or _generate_fallback_article(topic)
-        
+
+        article = (response.choices[0].message.content or "").strip()
+        return article if article else _generate_fallback_article(topic)
+
     except Exception as e:
         print(f"AI 生成失败: {e}")
         return _generate_fallback_article(topic)

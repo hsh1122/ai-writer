@@ -1,7 +1,7 @@
 /**
  * API 请求封装
  */
-const API_BASE = '/api'
+const API_BASE = 'http://127.0.0.1:8000'
 
 async function request(url, options = {}) {
   const res = await fetch(`${API_BASE}${url}`, {

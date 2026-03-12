@@ -1,4 +1,6 @@
 import { useState, useEffect } from 'react'
+import ReactMarkdown from 'react-markdown'
+import remarkGfm from 'remark-gfm'
 import { generateArticle, saveArticle, getHistory } from './api'
 import './App.css'
 
@@ -9,6 +11,22 @@ export default function App() {
   const [message, setMessage] = useState(null)
   const [history, setHistory] = useState([])
   const [activeTab, setActiveTab] = useState('write')
+  const [expandedId, setExpandedId] = useState(null)
+  const [copySuccess, setCopySuccess] = useState(false)
+
+  const handleCopy = async (text) => {
+    try {
+      await navigator.clipboard.writeText(text)
+      setCopySuccess(true)
+      setTimeout(() => setCopySuccess(false), 2000)
+    } catch (err) {
+      setMessage({ type: 'error', text: '复制失败' })
+    }
+  }
+
+  const toggleExpand = (id) => {
+    setExpandedId((prev) => (prev === id ? null : id))
+  }
 
   const loadHistory = async () => {
     try {
@@ -24,6 +42,7 @@ export default function App() {
   }, [])
 
   const handleGenerate = async () => {
+    if (loading) return
     if (!topic.trim()) {
       setMessage({ type: 'error', text: '请输入文章主题' })
       return
@@ -68,6 +87,9 @@ export default function App() {
 
   return (
     <div className="app">
+      {copySuccess && (
+        <div className="copy-toast">已复制到剪贴板</div>
+      )}
       <header className="header">
         <h1>AI 写作助手</h1>
         <p>输入主题，一键生成约500字文章</p>
@@ -125,10 +147,28 @@ export default function App() {
             </div>
           )}
 
+          {loading && (
+            <div className="article-loading" aria-live="polite">
+              <span className="spinner" aria-hidden />
+              <span>正在生成文章...</span>
+            </div>
+          )}
+
           {article && (
             <div className="article-box">
-              <label>生成的文章</label>
-              <pre className="article-content">{article}</pre>
+              <div className="article-box-header">
+                <label>生成的文章</label>
+                <button
+                  type="button"
+                  className="btn btn-secondary btn-sm"
+                  onClick={() => handleCopy(article)}
+                >
+                  复制文章
+                </button>
+              </div>
+              <div className="article-content markdown-body">
+                <ReactMarkdown remarkPlugins={[remarkGfm]}>{article}</ReactMarkdown>
+              </div>
             </div>
           )}
         </section>
@@ -141,12 +181,56 @@ export default function App() {
           ) : (
             <ul className="history-list">
               {history.map((item) => (
-                <li key={item.id} className="history-item" onClick={() => selectHistoryItem(item)}>
-                  <div className="history-topic">{item.topic}</div>
-                  <div className="history-date">
-                    {new Date(item.created_at).toLocaleString('zh-CN')}
+                <li
+                  key={item.id}
+                  className={`history-item ${expandedId === item.id ? 'expanded' : ''}`}
+                >
+                  <div
+                    className="history-card-header"
+                    onClick={() => toggleExpand(item.id)}
+                  >
+                    <div className="history-topic">{item.topic}</div>
+                    <div className="history-date">
+                      {new Date(item.created_at).toLocaleString('zh-CN')}
+                    </div>
+                    <div className="history-preview markdown-body">
+                      <ReactMarkdown remarkPlugins={[remarkGfm]}>
+                        {item.article.slice(0, 200) + (item.article.length > 200 ? '...' : '')}
+                      </ReactMarkdown>
+                    </div>
+                    <span className="history-expand-icon" aria-hidden>
+                      {expandedId === item.id ? '▲' : '▼'}
+                    </span>
                   </div>
-                  <div className="history-preview">{item.article.slice(0, 100)}...</div>
+                  <div className="history-expand-content">
+                    <div className="history-full-article markdown-body">
+                      <ReactMarkdown remarkPlugins={[remarkGfm]}>
+                        {item.article}
+                      </ReactMarkdown>
+                    </div>
+                    <div className="history-expand-actions">
+                      <button
+                        type="button"
+                        className="btn btn-secondary btn-sm"
+                        onClick={(e) => {
+                          e.stopPropagation()
+                          handleCopy(item.article)
+                        }}
+                      >
+                        复制文章
+                      </button>
+                      <button
+                        type="button"
+                        className="btn btn-secondary btn-sm"
+                        onClick={(e) => {
+                          e.stopPropagation()
+                          selectHistoryItem(item)
+                        }}
+                      >
+                        加载到写作
+                      </button>
+                    </div>
+                  </div>
                 </li>
               ))}
             </ul>
