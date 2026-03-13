@@ -39,3 +39,8 @@ class ArticleRecord(BaseModel):
 class HistoryResponse(BaseModel):
     """历史文章响应"""
     articles: list[ArticleRecord]
+
+
+class DeleteResponse(BaseModel):
+    """删除文章响应"""
+    message: str = "删除成功"

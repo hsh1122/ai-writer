@@ -375,22 +375,43 @@
   padding: 1rem 1.25rem;
   cursor: pointer;
   transition: background 0.2s;
-  position: relative;
-  padding-right: 2.5rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 1rem;
 }
 
 .history-card-header:hover {
   background: rgba(124, 110, 246, 0.06);
 }
 
+.history-header-content {
+  flex: 1;
+  min-width: 0;
+}
+
+.history-header-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  flex-shrink: 0;
+}
+
+.btn-delete {
+  background: transparent;
+  color: var(--text-secondary);
+  border: 1px solid var(--bg-card);
+}
+
+.btn-delete:hover {
+  color: var(--error);
+  border-color: var(--error);
+}
+
 .history-expand-icon {
-  position: absolute;
-  right: 1rem;
-  top: 50%;
-  transform: translateY(-50%);
   font-size: 0.75rem;
   color: var(--text-secondary);
-  transition: transform 0.3s ease;
+  transition: color 0.2s ease;
 }
 
 .history-item.expanded .history-expand-icon {

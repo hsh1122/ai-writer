@@ -7,9 +7,10 @@ from fastapi.middleware.cors import CORSMiddleware
 from models import (
     GenerateRequest, GenerateResponse,
     SaveRequest, SaveResponse,
-    ArticleRecord, HistoryResponse
+    ArticleRecord, HistoryResponse,
+    DeleteResponse
 )
-from database import init_db, save_article, get_all_articles
+from database import init_db, save_article, get_all_articles, delete_article
 from ai import generate_article
 
 app = FastAPI(title="AI 写作助手 API")
@@ -66,6 +67,14 @@ async def history():
         for row in articles
     ]
     return HistoryResponse(articles=records)
+
+
+@app.delete("/article/{article_id}", response_model=DeleteResponse)
+async def delete_article_by_id(article_id: int):
+    """根据ID删除文章"""
+    if not delete_article(article_id):
+        raise HTTPException(status_code=404, detail="文章不存在")
+    return DeleteResponse(message="删除成功")
 
 
 @app.get("/health")

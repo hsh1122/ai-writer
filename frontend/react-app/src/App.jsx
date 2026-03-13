@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react'
 import ReactMarkdown from 'react-markdown'
 import remarkGfm from 'remark-gfm'
-import { generateArticle, saveArticle, getHistory } from './api'
+import { generateArticle, saveArticle, getHistory, deleteArticle } from './api'
 import './App.css'
 
 export default function App() {
@@ -13,6 +13,7 @@ export default function App() {
   const [activeTab, setActiveTab] = useState('write')
   const [expandedId, setExpandedId] = useState(null)
   const [copySuccess, setCopySuccess] = useState(false)
+  const [deleteSuccess, setDeleteSuccess] = useState(false)
 
   const handleCopy = async (text) => {
     try {
@@ -85,10 +86,27 @@ export default function App() {
     setActiveTab('write')
   }
 
+  const handleDelete = async (e, item) => {
+    e.stopPropagation()
+    if (!window.confirm(`确定要删除「${item.topic}」吗？`)) return
+    try {
+      await deleteArticle(item.id)
+      setHistory((prev) => prev.filter((h) => h.id !== item.id))
+      if (expandedId === item.id) setExpandedId(null)
+      setDeleteSuccess(true)
+      setTimeout(() => setDeleteSuccess(false), 2000)
+    } catch (err) {
+      setMessage({ type: 'error', text: err.message || '删除失败' })
+    }
+  }
+
   return (
     <div className="app">
       {copySuccess && (
         <div className="copy-toast">已复制到剪贴板</div>
+      )}
+      {deleteSuccess && (
+        <div className="copy-toast">删除成功</div>
       )}
       <header className="header">
         <h1>AI 写作助手</h1>
@@ -176,6 +194,11 @@ export default function App() {
 
       {activeTab === 'history' && (
         <section className="history-section">
+          {message && (
+            <div className={`message message-${message.type}`}>
+              {message.text}
+            </div>
+          )}
           {history.length === 0 ? (
             <p className="empty">暂无历史文章</p>
           ) : (
@@ -189,18 +212,30 @@ export default function App() {
                     className="history-card-header"
                     onClick={() => toggleExpand(item.id)}
                   >
-                    <div className="history-topic">{item.topic}</div>
-                    <div className="history-date">
-                      {new Date(item.created_at).toLocaleString('zh-CN')}
+                    <div className="history-header-content">
+                      <div className="history-topic">{item.topic}</div>
+                      <div className="history-date">
+                        {new Date(item.created_at).toLocaleString('zh-CN')}
+                      </div>
+                      <div className="history-preview markdown-body">
+                        <ReactMarkdown remarkPlugins={[remarkGfm]}>
+                          {item.article.slice(0, 200) + (item.article.length > 200 ? '...' : '')}
+                        </ReactMarkdown>
+                      </div>
                     </div>
-                    <div className="history-preview markdown-body">
-                      <ReactMarkdown remarkPlugins={[remarkGfm]}>
-                        {item.article.slice(0, 200) + (item.article.length > 200 ? '...' : '')}
-                      </ReactMarkdown>
+                    <div className="history-header-actions">
+                      <button
+                        type="button"
+                        className="btn btn-delete btn-sm"
+                        onClick={(e) => handleDelete(e, item)}
+                        title="删除"
+                      >
+                        删除
+                      </button>
+                      <span className="history-expand-icon" aria-hidden>
+                        {expandedId === item.id ? '▲' : '▼'}
+                      </span>
                     </div>
-                    <span className="history-expand-icon" aria-hidden>
-                      {expandedId === item.id ? '▲' : '▼'}
-                    </span>
                   </div>
                   <div className="history-expand-content">
                     <div className="history-full-article markdown-body">

@@ -54,3 +54,11 @@ export async function saveArticle(topic, article) {
 export async function getHistory() {
   return request('/history')
 }
+
+/**
+ * 删除文章
+ * @param {number} id - 文章ID
+ */
+export async function deleteArticle(id) {
+  return request(`/article/${id}`, { method: 'DELETE' })
+}

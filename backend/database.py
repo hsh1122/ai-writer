@@ -55,3 +55,10 @@ def get_all_articles() -> list[dict]:
             "SELECT id, topic, article, created_at FROM articles ORDER BY created_at DESC"
         )
         return [dict(row) for row in cursor.fetchall()]
+
+
+def delete_article(article_id: int) -> bool:
+    """删除文章，返回是否删除成功（文章是否存在）"""
+    with get_connection() as conn:
+        cursor = conn.execute("DELETE FROM articles WHERE id = ?", (article_id,))
+        return cursor.rowcount > 0
