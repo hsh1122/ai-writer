@@ -2,6 +2,10 @@
 
 A minimal AI-powered writing assistant that generates ~500-word articles from a topic. Built with React, FastAPI, and SQLite.
 
+## Live Demo
+
+https://ai-writer-psi.vercel.app
+
 ## Project Overview
 
 ## Demo
@@ -31,6 +35,15 @@ AI Writer lets you enter a topic and generate a full article with one click. Art
 | Backend   | Python, FastAPI                                      |
 | Database  | SQLite                                               |
 | AI        | OpenAI-compatible API (with fallback template mode)   |
+
+## Architecture
+
+Frontend (Vercel)  
+↓  
+FastAPI Backend (Railway)  
+↓  
+SQLite Database
+
 
 ## Project Structure
 
