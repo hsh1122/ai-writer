@@ -49,23 +49,49 @@ ai-writer/
 ```
 
 ## Getting Started
+### Quick Start (Recommended)
+```bash
+git clone https://github.com/hsh1122/ai-writer.git
+cd ai-writer
+
+npm install
+npm run dev
+```
+
+Then open in your browser:
+
+http://localhost:3000
+
+This command starts both:
+- FastAPI backend
+- React frontend
 
 ### Prerequisites
 
 - Python 3.9+
 - Node.js 18+
 
-### 1. Backend
+### Manual Start (Optional)
+#### 1. Backend
 
 ```bash
+# create virtual environment
+python -m venv venv
+
+# activate venv (Windows)
+venv\Scripts\activate
+
+# install dependencies
 cd backend
 pip install -r requirements.txt
+
+# start backend server
 uvicorn main:app --reload
 ```
 
-Backend runs at `http://127.0.0.1:8000`.
+Backend runs at: http://127.0.0.1:8000
 
-### 2. Frontend
+#### 2. Frontend
 
 ```bash
 cd frontend/react-app
