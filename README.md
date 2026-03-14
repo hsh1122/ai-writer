@@ -147,6 +147,7 @@ OPENAI_MODEL=gpt-4o-mini
 | POST   | `/generate`| Generate article   |
 | POST   | `/save`    | Save article       |
 | GET    | `/history` | List saved articles|
+| DELETE   | `/article/{article_id}` | Delete article |
 | GET    | `/health`  | Health check       |
 
 ### POST /generate
